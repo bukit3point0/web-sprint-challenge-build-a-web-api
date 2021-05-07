@@ -77,6 +77,7 @@ router.put('/:id', (req, res) => {
     }
     Projects.update(projectId, editedData)
     .then(editedProject => {
+        console.log(editedProject)
             res.status(200).json(editedProject)
     })
     .catch(err => {

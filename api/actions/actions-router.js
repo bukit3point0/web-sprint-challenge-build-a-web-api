@@ -38,19 +38,18 @@ router.get('/:id', (req, res) => {
 // [POST] /api/actions
 router.post('/', (req, res) => {
     const newAction = req.body
+    if (
+        !newAction.project_id 
+        || !newAction.description 
+        || !newAction.notes
+    ) {
+        res.status(400).json({
+            message: `provide project id, description, and notes to this action`
+        })
+    }
     Actions.insert(newAction)
     .then((addAction) => {
-        if (
-            !addAction.project_id 
-            || !addAction.description 
-            || !addAction.notes
-        ) {
-            res.status(400).json({
-                message: `provide project id, description, and notes to this action`
-            })
-        } else {
-            res.status(200).json(addAction)
-        }
+            res.status(201).json(addAction)
     })
     .catch(err => {
         res.status(500).json({
@@ -60,15 +59,21 @@ router.post('/', (req, res) => {
 })
 // [PUT] /api/actions/:id
 router.put('/:id', (req, res) => {
-    Actions.update(req.params.id, req.body)
+    const actionId = req.params.id
+    const editAction = req.body
+    if(
+        !actionId 
+        || !editAction.project_id 
+        || !editAction.description 
+        || !editAction.notes
+    ) {
+        res.status(400).json({
+            message: `action does not exist`
+        })
+    }
+    Actions.update(actionId, editAction)
     .then(editedAction => {
-        if(!editedAction) {
-            res.status(400).json({
-                message: `action does not exist`
-            })
-        } else {
-            res.status(200).json(editedAction)
-        }
+        res.status(201).json(editedAction)
     })
     .catch(err => {
         res.status(500).json({
