@@ -13,7 +13,7 @@ router.get('/', (req, res) => {
     })
     .catch(err => {
         res.status(500).json({
-            message:err
+            message: err
         })
     })
 })
@@ -77,7 +77,7 @@ router.put('/:id', (req, res) => {
     Projects.update(req.params, req.body)
     .then(editedProject => {
         if (!editedProject) {
-            res.status(404).json({
+            res.status(400).json({
                 message: `project does not exist`
             })
         } else {
