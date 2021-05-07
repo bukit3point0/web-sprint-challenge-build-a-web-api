@@ -31,7 +31,7 @@ router.get('/:id', (req, res) => {
     })
     .catch(err => {
         res.status(500).json({
-            message: err
+            message: err.message
         })
     })
 })
@@ -39,13 +39,7 @@ router.get('/:id', (req, res) => {
 router.get('/:id/actions', (req, res) => {
     Projects.getProjectActions(req.params.id)
     .then(actions => {
-        if (actions.length > 0) {
             res.status(200).json(actions)
-        } else {
-            res.status(404).json({
-                message: `no actions for project`
-            })
-        }
     })
     .catch(err => {
         res.status(500).json({
@@ -56,17 +50,17 @@ router.get('/:id/actions', (req, res) => {
 // [POST] /api/projects
 router.post('/', (req, res) => {
     const newProject = req.body
+    if(!newProject.name || !newProject.description) {
+        res.status(400).json({
+            message: `provide project name and description`
+        })
+    }
     Projects.insert(newProject)
-    .then((addProject) => {
-        if(!addProject.name || !addProject.description) {
-            res.status(400).json({
-                message: `provide project name and description`
-            })
-        } else {
-            res.status(200).json(addProject)
-        }
+    .then(addProject => {
+            res.status(201).json(addProject)
     })
     .catch(err => {
+        // console.log(req.body)
         res.status(500).json({
             message: err
         })
@@ -74,19 +68,22 @@ router.post('/', (req, res) => {
 })
 // [PUT] /api/projects/:id
 router.put('/:id', (req, res) => {
-    Projects.update(req.params, req.body)
+    const projectId = req.params.id
+    const editedData = req.body
+    if(!projectId || !editedData.name || !editedData.description) {
+        res.status(400).json({
+            message: `project does not exist`
+        })
+    }
+    Projects.update(projectId, editedData)
     .then(editedProject => {
-        if (!editedProject) {
-            res.status(400).json({
-                message: `project does not exist`
-            })
-        } else {
             res.status(200).json(editedProject)
-        }
     })
     .catch(err => {
         res.status(500).json({
-            message: err
+            error: `post not found`,
+            message: err.message,
+            stack: err.stack
         })
     })
 })

@@ -7,7 +7,7 @@ const router = express.Router()
 
 // [GET] /api/actions
 router.get('/', (req, res) => {
-    Actions.get(req.query)
+    Actions.get()
     .then(actions => {
         res.status(200).json(actions)
     })
